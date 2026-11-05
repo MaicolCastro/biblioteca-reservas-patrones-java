@@ -12,7 +12,7 @@ public class Confirmada implements EstadoReserva {
 
     @Override
     public void cancelar(Reserva reserva) {
-        throw new IllegalStateException("Cancelación pendiente de integrar en la estación 6.");
+        reserva.cambiarEstado(new Cancelada());
     }
 
     @Override
