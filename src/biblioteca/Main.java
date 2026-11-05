@@ -1,53 +1,28 @@
 package biblioteca;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("=== ESTACIÓN 3: PRUEBAS DE BUILDER ===");
+        System.out.println("=== ESTACIÓN 4: PRUEBAS DE STRATEGY ===");
 
-        // 1. Prueba de construcción válida
-        System.out.println("--- 1. Construcción válida ---");
-        Reserva reserva = new ReservaBuilder()
-                .estudiante(new Estudiante("E001", "Laura"))
-                .fecha(LocalDate.now().plusDays(7))
-                .horaInicio(LocalTime.of(14, 0))
-                .duracionHoras(2)
-                .cantidadPersonas(4)
-                .sala(new Sala("B", "Sala B", 4))
-                .build();
-        System.out.println(reserva);
+        List<Sala> disponibles = List.of(
+            new Sala("A", "Sala A", 2),
+            new Sala("B", "Sala B", 4),
+            new Sala("C", "Sala C", 6),
+            new Sala("D", "Sala D", 8)
+        );
 
-        // 2. Prueba negativa: estudiante omitido
-        System.out.println("\n--- 2. Prueba negativa: estudiante omitido ---");
-        try {
-            new ReservaBuilder()
-                    .fecha(LocalDate.now().plusDays(7))
-                    .horaInicio(LocalTime.of(14, 0))
-                    .duracionHoras(2)
-                    .cantidadPersonas(4)
-                    .sala(new Sala("B", "Sala B", 4))
-                    .build();
-            System.out.println("ERROR: No debió permitir la construcción.");
-        } catch (IllegalStateException ex) {
-            System.out.println("Rechazo esperado por estudiante omitido: " + ex.getMessage());
-        }
+        EstrategiaSeleccionSala porCapacidad = new SeleccionPorCapacidad();
+        System.out.println("Para 4 personas: "
+                + porCapacidad.seleccionar(disponibles, 4).orElse(null));
 
-        // 3. Prueba negativa: capacidad de sala insuficiente
-        System.out.println("\n--- 3. Prueba negativa: capacidad insuficiente ---");
-        try {
-            new ReservaBuilder()
-                    .estudiante(new Estudiante("E001", "Laura"))
-                    .fecha(LocalDate.now().plusDays(7))
-                    .horaInicio(LocalTime.of(14, 0))
-                    .duracionHoras(2)
-                    .cantidadPersonas(5)
-                    .sala(new Sala("B", "Sala B", 4))
-                    .build();
-            System.out.println("ERROR: No debió permitir la construcción.");
-        } catch (IllegalStateException ex) {
-            System.out.println("Rechazo esperado por capacidad insuficiente: " + ex.getMessage());
-        }
+        EstrategiaSeleccionSala preferida = new SeleccionSalaPreferida("C");
+        System.out.println("Preferida C: "
+                + preferida.seleccionar(disponibles, 4).orElse(null));
+
+        EstrategiaSeleccionSala preferidaNoAdecuada = new SeleccionSalaPreferida("B");
+        System.out.println("Preferida B para 7: "
+                + preferidaNoAdecuada.seleccionar(disponibles, 7).orElse(null));
     }
 }
