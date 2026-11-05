@@ -1,0 +1,24 @@
+# Material del agente; no pertenece al proyecto que se entrega.
+INSTRUCCIONES_ANTIGRAVITY/
+
+# Compilados y temporales Java
+out/
+bin/
+build/
+target/
+*.class
+*.jar
+*.log
+
+# IDE y sistema operativo
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Archivos potencialmente sensibles
+.env
+.env.*
+*.pem
+*.key
