@@ -13,7 +13,7 @@ public class Pendiente implements EstadoReserva {
 
     @Override
     public void confirmar(Reserva reserva) {
-        // En estación 7 se integra con la transición formal a Confirmada
+        reserva.cambiarEstado(new Confirmada());
     }
 
     @Override

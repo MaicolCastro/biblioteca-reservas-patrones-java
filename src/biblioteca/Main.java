@@ -1,28 +1,24 @@
 package biblioteca;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("=== ESTACIÓN 4: PRUEBAS DE STRATEGY ===");
-
-        List<Sala> disponibles = List.of(
-            new Sala("A", "Sala A", 2),
-            new Sala("B", "Sala B", 4),
-            new Sala("C", "Sala C", 6),
-            new Sala("D", "Sala D", 8)
-        );
-
-        EstrategiaSeleccionSala porCapacidad = new SeleccionPorCapacidad();
-        System.out.println("Para 4 personas: "
-                + porCapacidad.seleccionar(disponibles, 4).orElse(null));
-
-        EstrategiaSeleccionSala preferida = new SeleccionSalaPreferida("C");
-        System.out.println("Preferida C: "
-                + preferida.seleccionar(disponibles, 4).orElse(null));
-
-        EstrategiaSeleccionSala preferidaNoAdecuada = new SeleccionSalaPreferida("B");
-        System.out.println("Preferida B para 7: "
-                + preferidaNoAdecuada.seleccionar(disponibles, 7).orElse(null));
+        System.out.println("=== ESTACIÓN 5: PRUEBA DE FACADE ===");
+        RepositorioSalas salas = new RepositorioSalasMemoria();
+        RepositorioReservasMemoria reservas = new RepositorioReservasMemoria();
+        ReservaFacade fachada = new ReservaFacade(salas, reservas);
+        var resultado = fachada.realizarReserva(
+                new Estudiante("E001", "Laura"), LocalDate.now().plusDays(7),
+                LocalTime.of(14, 0), 2, 4, new SeleccionPorCapacidad());
+        System.out.println("Resultado: " + resultado.orElseThrow());
+        System.out.println("Reservas guardadas: " + reservas.obtenerTodas().size());
+        if (resultado.orElseThrow().getNombreEstado().equals("Confirmada")
+                && reservas.obtenerTodas().size() == 1) {
+            System.out.println("P06 APROBADA: reserva registrada y confirmada.");
+        } else {
+            throw new AssertionError("Fachada no confirmó y guardó la reserva.");
+        }
     }
 }
