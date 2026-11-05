@@ -1,6 +1,6 @@
 package biblioteca;
 
-/** Estado confirmado provisional. Las demás transiciones se completan en State (estación 7). */
+/** Confirmada permite cancelar o finalizar, pero no volver a confirmar. */
 public class Confirmada implements EstadoReserva {
     @Override
     public String nombre() { return "Confirmada"; }
@@ -17,6 +17,6 @@ public class Confirmada implements EstadoReserva {
 
     @Override
     public void finalizar(Reserva reserva) {
-        throw new IllegalStateException("Finalización pendiente de integrar en la estación 7.");
+        reserva.cambiarEstado(new Finalizada());
     }
 }
