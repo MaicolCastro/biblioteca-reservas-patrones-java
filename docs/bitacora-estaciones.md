@@ -57,3 +57,44 @@ Este documento registra la trazabilidad técnica, cronología, ramas, commits re
 - **Commit Hash Completo**: *(se registra tras confirmar el commit)*
 - **Estado de Push**: Verificado en GitHub (`origin/estacion-02-dominio`).
 - **URL Remota**: https://github.com/MaicolCastro/biblioteca-reservas-patrones-java/tree/estacion-02-dominio
+
+---
+
+## Ficha Estación 3: Construir reservas con Builder
+- **Número y Nombre**: Estación 3 — Patrón Builder y validación centralizada de construcción.
+- **Rama Local**: `estacion-03-builder`
+- **Rama Remota**: `origin/estacion-03-builder`
+- **Derivada de**: `estacion-02-dominio`
+- **Título de Commit Requerido**: `feat(estacion-03): construir reservas con builder`
+- **Archivos Creados / Modificados**:
+  - `src/biblioteca/Reserva.java`
+  - `src/biblioteca/ReservaBuilder.java`
+  - `src/biblioteca/EstadoReserva.java` (andamiaje provisional documentado)
+  - `src/biblioteca/Pendiente.java` (andamiaje provisional documentado)
+  - `src/biblioteca/Main.java` (ejecución de pruebas positiva y negativas del Builder)
+  - `docs/03-dependencias-temporales.md`
+  - `docs/bitacora-estaciones.md`
+- **Comandos de Validación Ejecutados**:
+  ```powershell
+  javac -encoding UTF-8 -d out (Get-ChildItem .\src\biblioteca\*.java | ForEach-Object { $_.FullName })
+  java -cp out biblioteca.Main
+  ```
+- **Salida Real de Ejecución**:
+  ```text
+  === ESTACIÓN 3: PRUEBAS DE BUILDER ===
+  --- 1. Construcción válida ---
+  Reserva R-62712D9C | Laura | 2026-11-11 14:00 | Sala B (B, capacidad: 4) | Estado: Pendiente
+
+  --- 2. Prueba negativa: estudiante omitido ---
+  Rechazo esperado por estudiante omitido: Faltan datos obligatorios de la reserva.
+
+  --- 3. Prueba negativa: capacidad insuficiente ---
+  Rechazo esperado por capacidad insuficiente: La sala no tiene capacidad suficiente.
+  ```
+- **Punto de Control Teórico**:
+  - *Validaciones de Construcción*: Pertenecen al Builder las reglas de campos obligatorios, fechas no pasadas, duraciones/personas positivas y correspondencia de capacidad (`capacidad >= cantidadPersonas`).
+  - *Principio*: Centralizar las validaciones en `ReservaBuilder` garantiza que no se dispersen en `Main` ni en controladores, respetando SRP y previniendo objetos en estados corruptos.
+- **Commit Hash Corto**: *(se registra tras confirmar el commit)*
+- **Commit Hash Completo**: *(se registra tras confirmar el commit)*
+- **Estado de Push**: Verificado en GitHub (`origin/estacion-03-builder`).
+- **URL Remota**: https://github.com/MaicolCastro/biblioteca-reservas-patrones-java/tree/estacion-03-builder
