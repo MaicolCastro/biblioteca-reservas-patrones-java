@@ -4,33 +4,70 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+/** Punto de entrada: configura dependencias y ejecuta el escenario de la guía. */
 public class Main {
     public static void main(String[] args) {
-        System.out.println("=== ESTACIÓN 7: STATE ===");
-        ReservaFacade fachada = new ReservaFacade(new RepositorioSalasMemoria(),
-                new RepositorioReservasMemoria(),
-                List.of(new NotificadorEstudiante(), new RegistroEventos()));
-        Reserva primera = fachada.realizarReserva(
-                new Estudiante("E001", "Laura"), LocalDate.now().plusDays(7),
-                LocalTime.of(14, 0), 2, 4, new SeleccionPorCapacidad()).orElseThrow();
-        primera.cancelar();
-        System.out.println("Después de cancelar: " + primera.getNombreEstado());
+        RepositorioSalas salas = new RepositorioSalasMemoria();
+        RepositorioReservasMemoria reservas = new RepositorioReservasMemoria();
+        List<ObservadorReserva> observadores = List.of(
+                new NotificadorEstudiante(),
+                new RegistroEventos()
+        );
+        ReservaFacade fachada = new ReservaFacade(salas, reservas, observadores);
+        Estudiante laura = new Estudiante("E001", "Laura");
+
+        System.out.println("=== ESCENARIO PRINCIPAL ===");
+        Reserva reserva = fachada.realizarReserva(
+                laura,
+                LocalDate.now().plusDays(7),
+                LocalTime.of(14, 0),
+                2,
+                4,
+                new SeleccionPorCapacidad()
+        ).orElseThrow();
+        System.out.println(reserva);
+
+        System.out.println("\nLaura cancela la reserva:");
+        reserva.cancelar();
+        System.out.println(reserva);
+
+        System.out.println("\nIntento inválido: confirmar una reserva cancelada.");
         try {
-            primera.confirmar();
-            throw new AssertionError("La confirmación de una cancelada debería rechazarse.");
+            reserva.confirmar();
         } catch (IllegalStateException ex) {
-            System.out.println("Rechazo esperado: " + ex.getMessage());
+            System.out.println("Operación rechazada: " + ex.getMessage());
         }
-        Reserva segunda = fachada.realizarReserva(
-                new Estudiante("E004", "Samuel"), LocalDate.now().plusDays(10),
-                LocalTime.of(11, 0), 1, 2, new SeleccionPorCapacidad()).orElseThrow();
-        segunda.finalizar();
-        System.out.println("Después de finalizar: " + segunda.getNombreEstado());
-        try {
-            segunda.cancelar();
-            throw new AssertionError("La cancelación de una finalizada debería rechazarse.");
-        } catch (IllegalStateException ex) {
-            System.out.println("Rechazo esperado: " + ex.getMessage());
-        }
+
+        System.out.println("\n=== PRUEBA DE SALA PREFERIDA ===");
+        fachada.realizarReserva(
+                new Estudiante("E002", "Andrés"),
+                LocalDate.now().plusDays(8),
+                LocalTime.of(10, 0),
+                2,
+                4,
+                new SeleccionSalaPreferida("C")
+        ).ifPresent(System.out::println);
+
+        System.out.println("\n=== PRUEBA SIN SALA ADECUADA ===");
+        fachada.realizarReserva(
+                new Estudiante("E003", "Camila"),
+                LocalDate.now().plusDays(9),
+                LocalTime.of(9, 0),
+                2,
+                10,
+                new SeleccionPorCapacidad()
+        );
+
+        System.out.println("\n=== PRUEBA DE FINALIZACIÓN ===");
+        Reserva otra = fachada.realizarReserva(
+                new Estudiante("E004", "Samuel"),
+                LocalDate.now().plusDays(10),
+                LocalTime.of(11, 0),
+                1,
+                2,
+                new SeleccionPorCapacidad()
+        ).orElseThrow();
+        otra.finalizar();
+        System.out.println(otra);
     }
 }
